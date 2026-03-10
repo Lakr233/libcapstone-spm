@@ -158,24 +158,30 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Capstone",
+            name: "CoreCapstone",
             path: ".",
             exclude: [
                 ".github",
                 "Script",
                 "Tests",
+                "Sources/Capstone",
                 "LICENSE",
                 "README.md",
                 ".gitignore",
                 ".gitmodules",
             ],
             sources: capstoneCoreSources + capstoneArchSources,
-            publicHeadersPath: "Sources/Capstone/include",
+            publicHeadersPath: "Sources/CoreCapstone/include",
             cSettings: capstoneDefines.map { .define($0, to: "1") } + [
                 .headerSearchPath("Vendor/capstone"),
                 .headerSearchPath("Vendor/capstone/include"),
                 .unsafeFlags(["-Wno-shorten-64-to-32"]),
             ]
+        ),
+        .target(
+            name: "Capstone",
+            dependencies: ["CoreCapstone"],
+            path: "Sources/Capstone"
         ),
         .testTarget(
             name: "CapstoneTests",
