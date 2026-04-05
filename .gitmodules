@@ -1,3 +1,0 @@
-[submodule "Vendor/capstone"]
-	path = Vendor/capstone
-	url = https://github.com/capstone-engine/capstone.git
