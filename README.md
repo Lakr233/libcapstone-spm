@@ -15,8 +15,15 @@ with a Swift-friendly wrapper API.
 ## Install
 
 ```swift
-.package(url: "https://github.com/Lakr233/libcapstone-spm.git", from: "0.1.0")
+.package(url: "https://github.com/Lakr233/libcapstone-spm.git", from: "0.1.3")
 ```
+
+Needs a Swift 6.2 or newer toolchain: the manifest is `swift-tools-version:6.2`
+so that it can silence Capstone's own `-Wshorten-64-to-32` warnings through
+`CSetting.disableWarning` rather than `.unsafeFlags`. That distinction is why
+`from:` works here at all — SwiftPM refuses to resolve a package by version
+when one of its targets carries an unsafe flag, so releases before 0.1.3 could
+only be depended on by `branch:` or `revision:`.
 
 ```swift
 .target(

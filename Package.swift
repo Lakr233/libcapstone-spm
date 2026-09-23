@@ -1,4 +1,8 @@
-// swift-tools-version:6.0
+// swift-tools-version:6.2
+//
+// 6.2 rather than 6.0 for one API: `CSetting.disableWarning`, which arrived in
+// _PackageDescription 6.2 and is what lets this package be resolved by version.
+// See the note on CoreCapstone's cSettings below.
 
 import PackageDescription
 
@@ -172,10 +176,21 @@ let package = Package(
             ],
             sources: capstoneCoreSources + capstoneArchSources,
             publicHeadersPath: "Sources/CoreCapstone/include",
+            // `.disableWarning`, not `.unsafeFlags(["-Wno-shorten-64-to-32"])`.
+            // The two produce the same flag, but SwiftPM refuses to resolve a
+            // dependency by version when any of its targets carries an unsafe
+            // flag — so that one line forced every consumer onto a `branch:` or
+            // `revision:` requirement, giving up the version pinning that is
+            // the whole point of depending on a released package.
+            //
+            // The warning itself is not suppressible by fixing it here: all
+            // 1,885 of them are in upstream Capstone's own sources under
+            // Vendor/, most of them in generated .inc tables. Silencing the one
+            // category is what upstream's own Xcode project does.
             cSettings: capstoneDefines.map { .define($0, to: "1") } + [
                 .headerSearchPath("Vendor/capstone"),
                 .headerSearchPath("Vendor/capstone/include"),
-                .unsafeFlags(["-Wno-shorten-64-to-32"]),
+                .disableWarning("shorten-64-to-32"),
             ]
         ),
         .target(
