@@ -80,7 +80,8 @@ public struct AArch64Detail: Sendable {
         postIndex = raw.post_index
         operands = withUnsafeBytes(of: raw.operands) { buf in
             let p = buf.baseAddress!.assumingMemoryBound(to: cs_aarch64_op.self)
-            return (0 ..< Int(raw.op_count)).map { AArch64Operand(p[$0]) }
+            let cap = buf.count / MemoryLayout<cs_aarch64_op>.stride
+            return (0 ..< min(Int(raw.op_count), cap)).map { AArch64Operand(p[$0]) }
         }
     }
 }
@@ -111,7 +112,8 @@ public struct X86Detail: Sendable {
     init(_ raw: cs_x86) {
         operands = withUnsafeBytes(of: raw.operands) { buf in
             let p = buf.baseAddress!.assumingMemoryBound(to: cs_x86_op.self)
-            return (0 ..< Int(raw.op_count)).map { X86Operand(p[$0]) }
+            let cap = buf.count / MemoryLayout<cs_x86_op>.stride
+            return (0 ..< min(Int(raw.op_count), cap)).map { X86Operand(p[$0]) }
         }
     }
 }
